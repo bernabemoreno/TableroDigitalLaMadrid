@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Congregación LaMadrid</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>Congregación LaMadrid</h1>
+    <p>Programas, salidas y mapa de la congregación</p>
+  </header>
+
+  <nav class="tabs" aria-label="Secciones principales">
+    <button class="tab active" data-section="salidas">Salidas</button>
+    <button class="tab" data-section="entresemana">Entre semana</button>
+    <button class="tab" data-section="findesemana">Fin de semana</button>
+    <button class="tab" data-section="mapa">Mapa</button>
+  </nav>
+
+  <main>
+    <section id="salidas" class="panel active">
+      <div class="panel-head">
+        <div>
+          <h2>Salidas</h2>
+          <p class="hint">Datos tomados desde <strong>salidas.csv</strong></p>
+        </div>
+        <button onclick="printSection('salidas')">Imprimir</button>
+      </div>
+      <div id="salidas-content" class="content-box"></div>
+    </section>
+
+    <section id="entresemana" class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Reunión de entre semana</h2>
+          <p class="hint">Datos tomados desde <strong>entresemana.csv</strong></p>
+        </div>
+        <button onclick="printSection('entresemana')">Imprimir</button>
+      </div>
+      <div id="entresemana-content" class="content-box"></div>
+    </section>
+
+    <section id="findesemana" class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Reunión de fin de semana</h2>
+          <p class="hint">Datos tomados desde <strong>findesemana.csv</strong></p>
+        </div>
+        <button onclick="printSection('findesemana')">Imprimir</button>
+      </div>
+      <div id="findesemana-content" class="content-box"></div>
+    </section>
+
+    <section id="mapa" class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Mapa de la congregación</h2>
+          <p class="hint">Usa <strong>mapa.jpg</strong> y el enlace configurado en <strong>config.json</strong></p>
+        </div>
+        <button onclick="printSection('mapa')">Imprimir mapa</button>
+      </div>
+
+      <div class="map-actions">
+        <a id="online-map" class="button-link" href="#" target="_blank" rel="noopener">Acceder a mapa online</a>
+        <a class="button-link" href="mapa.jpg" download>Descargar mapa para imprimir</a>
+      </div>
+
+      <div class="map-preview">
+        <img src="mapa.jpg" alt="Mapa completo de la congregación" onerror="this.closest('.map-preview').innerHTML='<p>No se encontró el archivo mapa.jpg. Subilo al repositorio para que aparezca acá.</p>'" />
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Última actualización visible según los archivos CSV cargados en GitHub.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
