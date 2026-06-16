@@ -1,16 +1,6 @@
-# Sitio Congregación LaMadrid - Julio 2026
+# Congregación LaMadrid - Tablero digital
 
-Sitio estático para publicar salidas, reunión de entre semana, reunión de fin de semana y mapa.
-
-## Cómo usarlo
-
-1. Subí todos estos archivos a un repositorio de GitHub.
-2. Activá GitHub Pages.
-3. El sitio lee automáticamente los CSV del repositorio.
-4. También permite cargar CSV locales desde la computadora para probar o imprimir sin subirlos.
-5. Cada sección tiene botón **Imprimir**.
-
-## Archivos del sistema
+## Archivos principales
 
 - `index.html`
 - `style.css`
@@ -23,50 +13,17 @@ Sitio estático para publicar salidas, reunión de entre semana, reunión de fin
 - `config.json`
 - `mapa.jpg` opcional
 
-## CSV de entre semana
+## Uso en GitHub Pages
 
-El programa se arma con tres archivos:
+Subí todos los archivos al repositorio. El sitio lee automáticamente los CSV publicados.
 
-### entresemana-semanas.csv
-
-Columnas:
-
-```csv
-Semana,LecturaSemanal,CancionInicial,Presidente,Introduccion,CancionVidaCristiana,Conclusion,CancionFinal,OracionFinal,Notas,Tipo
-```
-
-### entresemana-partes.csv
-
-Columnas:
-
-```csv
-Semana,Seccion,Orden,Titulo,Asignado,Ayudante,Observaciones
-```
-
-Secciones esperadas:
-
-- `Tesoros de la Biblia`
-- `Seamos mejores maestros`
-- `Nuestra vida cristiana`
-
-### entresemana-estudio.csv
-
-Columnas:
-
-```csv
-Semana,Lecciones,Conductor,Lector,Observaciones
-```
-
-El Estudio bíblico de la congregación se muestra dentro de Nuestra Vida Cristiana.
+También permite cargar CSV locales desde la computadora para probar o imprimir sin subirlos.
 
 ## Mapa
 
-En `config.json` cambiá el enlace:
+Para el mapa impreso, subí una imagen llamada `mapa.jpg`.
+Para el mapa online, cambiá el enlace dentro de `config.json`.
 
-```json
-{
-  "mapaOnline": "https://maps.google.com/..."
-}
-```
+## Evitar caché
 
-Subí la imagen completa como `mapa.jpg`.
+Si actualizás archivos y no ves cambios, usá Ctrl + F5 o agregá `?v=2` al final de la dirección.

@@ -4,15 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Congregación LaMadrid</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=final-2026-07" />
 </head>
 <body>
-  <header class="site-header">
+  <header class="site-header no-print">
     <h1>Congregación LaMadrid</h1>
     <p>Programas, salidas y mapa de la congregación</p>
   </header>
 
-  <nav class="tabs" aria-label="Secciones principales">
+  <nav class="tabs no-print" aria-label="Secciones principales">
     <button class="tab active" data-section="salidas">Salidas</button>
     <button class="tab" data-section="entresemana">Entre semana</button>
     <button class="tab" data-section="findesemana">Fin de semana</button>
@@ -21,54 +21,54 @@
 
   <main>
     <section id="salidas" class="panel active">
-      <div class="panel-head">
+      <div class="panel-head no-print">
         <div>
           <h2>Salidas</h2>
-          <p class="hint">Lee <strong>salidas.csv</strong> desde GitHub o podés cargar uno local para probar/imprimir.</p>
+          <p class="hint">Lee <strong>salidas.csv</strong> desde GitHub o permite cargar uno local.</p>
         </div>
         <button onclick="printSection('salidas')">Imprimir</button>
       </div>
-      <div class="local-loader">
+      <div class="local-loader no-print">
         <label>Cargar CSV local de salidas: <input type="file" accept=".csv,text/csv" data-local-csv="salidas" /></label>
         <button class="secondary" onclick="reloadFromGithub('salidas')">Volver a GitHub</button>
       </div>
-      <div id="salidas-content" class="content-box"></div>
+      <div id="salidas-content" class="content-box table-box"></div>
     </section>
 
     <section id="entresemana" class="panel">
-      <div class="panel-head">
+      <div class="panel-head no-print">
         <div>
           <h2>Reunión de entre semana</h2>
           <p class="hint">Lee <strong>entresemana-semanas.csv</strong>, <strong>entresemana-partes.csv</strong> y <strong>entresemana-estudio.csv</strong>.</p>
         </div>
         <button onclick="printSection('entresemana')">Imprimir</button>
       </div>
-      <div class="local-loader grid-loader">
+      <div class="local-loader grid-loader no-print">
         <label>Semanas: <input type="file" accept=".csv,text/csv" data-local-csv="entresemana-semanas" /></label>
         <label>Partes: <input type="file" accept=".csv,text/csv" data-local-csv="entresemana-partes" /></label>
         <label>Estudio bíblico: <input type="file" accept=".csv,text/csv" data-local-csv="entresemana-estudio" /></label>
         <button class="secondary" onclick="reloadFromGithub('entresemana')">Volver a GitHub</button>
       </div>
-      <div id="entresemana-content" class="content-box"></div>
+      <div id="entresemana-content" class="content-box program-wrapper"></div>
     </section>
 
     <section id="findesemana" class="panel">
-      <div class="panel-head">
+      <div class="panel-head no-print">
         <div>
           <h2>Reunión de fin de semana</h2>
-          <p class="hint">Lee <strong>findesemana.csv</strong> desde GitHub o podés cargar uno local.</p>
+          <p class="hint">Lee <strong>findesemana.csv</strong> desde GitHub o permite cargar uno local.</p>
         </div>
         <button onclick="printSection('findesemana')">Imprimir</button>
       </div>
-      <div class="local-loader">
+      <div class="local-loader no-print">
         <label>Cargar CSV local de fin de semana: <input type="file" accept=".csv,text/csv" data-local-csv="findesemana" /></label>
         <button class="secondary" onclick="reloadFromGithub('findesemana')">Volver a GitHub</button>
       </div>
-      <div id="findesemana-content" class="content-box"></div>
+      <div id="findesemana-content" class="content-box table-box"></div>
     </section>
 
     <section id="mapa" class="panel">
-      <div class="panel-head">
+      <div class="panel-head no-print">
         <div>
           <h2>Mapa de la congregación</h2>
           <p class="hint">Usa <strong>mapa.jpg</strong> y el enlace configurado en <strong>config.json</strong>.</p>
@@ -76,21 +76,21 @@
         <button onclick="printSection('mapa')">Imprimir mapa</button>
       </div>
 
-      <div class="map-actions">
+      <div class="map-actions no-print">
         <a id="online-map" class="button-link" href="#" target="_blank" rel="noopener">Acceder a mapa online</a>
         <a class="button-link" href="mapa.jpg" download>Descargar mapa para imprimir</a>
       </div>
 
-      <div class="map-preview">
+      <div class="content-box map-preview">
         <img src="mapa.jpg" alt="Mapa completo de la congregación" onerror="this.closest('.map-preview').innerHTML='<p>No se encontró el archivo mapa.jpg. Subilo al repositorio para que aparezca acá.</p>'" />
       </div>
     </section>
   </main>
 
-  <footer>
-    <p>Última actualización según los archivos CSV publicados en GitHub o los archivos locales cargados para prueba.</p>
+  <footer class="no-print">
+    <p>Última actualización según los archivos CSV publicados en GitHub o los archivos locales cargados.</p>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=final-2026-07"></script>
 </body>
 </html>

@@ -90,6 +90,13 @@ function normalizeSection(section) {
   return sectionLabels[clean] || String(section || 'OTROS').toUpperCase();
 }
 
+function sectionClass(section) {
+  if (section === 'TESOROS DE LA BIBLIA') return 'treasures';
+  if (section === 'SEAMOS MEJORES MAESTROS') return 'teachers';
+  if (section === 'NUESTRA VIDA CRISTIANA') return 'christian';
+  return 'treasures';
+}
+
 function isSpecialWeek(week) {
   return String(week.Tipo || week.TipoSemana || '').toLowerCase().includes('especial') ||
     (!week.LecturaSemanal && !week.CancionInicial && !week.Presidente && week.Notas);
@@ -108,10 +115,9 @@ function renderEntreSemana({ semanas, partes, estudio }) {
 
     if (isSpecialWeek(week)) {
       return `<article class="program-card special-week">
-        <h3>PROGRAMA REUNIÓN ENTRE SEMANA</h3>
-        <p class="subtitle">Congregación LaMadrid</p>
-        <h2>${escapeHTML(formatWeekTitle(semana))}</h2>
-        ${notes ? `<p>${escapeHTML(notes)}</p>` : ''}
+        ${renderTopLine()}
+        <h2 class="week-title">${escapeHTML(formatWeekTitle(semana))}</h2>
+        ${notes ? `<p class="special-note">${escapeHTML(notes)}</p>` : ''}
       </article>`;
     }
 
@@ -132,48 +138,40 @@ function renderEntreSemana({ semanas, partes, estudio }) {
     const sectionsHtml = orderedSections.map(section => {
       const rows = groupedSections[section].map(item => renderProgramItem(item)).join('');
       const songBefore = section === 'NUESTRA VIDA CRISTIANA' && week.CancionVidaCristiana
-        ? `<p class="section-song">Canción ${escapeHTML(week.CancionVidaCristiana)}</p>` : '';
+        ? `<p class="section-song"><strong>Canción ${escapeHTML(week.CancionVidaCristiana)}</strong></p>` : '';
       const studiesInside = section === 'NUESTRA VIDA CRISTIANA' ? renderStudies(weekStudies) : '';
-      return `${songBefore}<h4 class="section-banner ${sectionClass(section)}"><span>${escapeHTML(section)}</span></h4><ol class="program-list">${rows}</ol>${studiesInside}`;
+      return `<section class="program-section">${songBefore}<div class="section-bar ${sectionClass(section)}">${escapeHTML(section)}</div><ol class="program-list">${rows}</ol>${studiesInside}</section>`;
     }).join('');
 
     return `<article class="program-card">
-      <div class="program-headline">
-        <div class="program-cong">Lamadrid</div>
-        <div class="program-name">Programa para la reunión de entre semana</div>
-      </div>
-      <div class="program-rule"><span></span></div>
-      <h2>${escapeHTML(formatWeekTitle(semana))}</h2>
+      ${renderTopLine()}
+      <h2 class="week-title">${escapeHTML(formatWeekTitle(semana))}</h2>
       ${notes ? `<p class="week-note">${escapeHTML(notes)}</p>` : ''}
       <div class="program-meta">
-        ${week.LecturaSemanal ? `<p>Lectura semanal de la Biblia: ${escapeHTML(week.LecturaSemanal)}</p>` : ''}
-        ${week.CancionInicial ? `<p>Canción ${escapeHTML(week.CancionInicial)}</p>` : ''}
-        ${week.Presidente ? `<p>Presidente y oración: ${escapeHTML(week.Presidente)}</p>` : ''}
-        ${week.Introduccion ? `<p class="intro-line">${escapeHTML(week.Introduccion)}</p>` : ''}
+        ${week.LecturaSemanal ? `<p><strong>Lectura semanal de la Biblia:</strong> ${escapeHTML(week.LecturaSemanal)}</p>` : ''}
+        ${week.CancionInicial ? `<p><strong>Canción ${escapeHTML(week.CancionInicial)}</strong></p>` : ''}
+        ${week.Presidente ? `<p><strong>Presidente y oración:</strong> ${escapeHTML(week.Presidente)}</p>` : ''}
       </div>
+      ${week.Introduccion ? `<p class="intro-line">${escapeHTML(week.Introduccion)}</p>` : ''}
       ${sectionsHtml}
       <div class="program-footer">
         ${week.Conclusion ? `<p>${escapeHTML(week.Conclusion)}</p>` : ''}
-        ${week.CancionFinal ? `<p>Canción ${escapeHTML(week.CancionFinal)}</p>` : ''}
+        ${week.CancionFinal ? `<p><strong>Canción ${escapeHTML(week.CancionFinal)}</strong></p>` : ''}
         ${week.OracionFinal ? `<p>Oración: ${escapeHTML(week.OracionFinal)}</p>` : ''}
       </div>
     </article>`;
   }).join('');
 }
 
-function sectionClass(section) {
-  const clean = String(section || '').toUpperCase();
-  if (clean.includes('TESOROS')) return 'section-tesoros';
-  if (clean.includes('SEAMOS')) return 'section-seamos';
-  if (clean.includes('VIDA')) return 'section-vida';
-  return 'section-otros';
+function renderTopLine() {
+  return `<div class="program-topline"><span>Lamadrid</span><span class="top-line"></span><span class="top-right">Programa para la reunión de entre semana</span></div>`;
 }
 
 function renderStudies(weekStudies) {
   return weekStudies.map(st => `<div class="book-study">
-    <p><span class="study-title">Estudio bíblico de la congregación</span>${st.Lecciones ? ` <span class="study-lessons">(${escapeHTML(st.Lecciones)})</span>` : ''}
-    ${st.Conductor ? `<span class="program-dash">—</span> <span class="program-assigned">${escapeHTML(st.Conductor)}</span>` : ''}${st.Lector ? ` <span class="helper">c/ ${escapeHTML(st.Lector)}</span>` : ''}</p>
-    ${st.Observaciones ? `<p class="program-observation no-indent">${escapeHTML(st.Observaciones)}</p>` : ''}
+    <span class="program-number">${escapeHTML(st.Orden || '')}</span>
+    <p><span class="program-title">Estudio bíblico de la congregación</span>${st.Lecciones ? ` (${escapeHTML(st.Lecciones)})` : ''}
+    ${st.Conductor ? ` <span class="program-dash">—</span> <span class="program-assigned">${escapeHTML(st.Conductor)}</span>` : ''}${st.Lector ? ` <span class="helper">c/ ${escapeHTML(st.Lector)}</span>` : ''}${st.Observaciones ? ` <span class="program-observation">${escapeHTML(st.Observaciones)}</span>` : ''}</p>
   </div>`).join('');
 }
 
@@ -181,15 +179,14 @@ function renderProgramItem(item) {
   const helper = item.Ayudante ? ` <span class="helper">c/ ${escapeHTML(item.Ayudante)}</span>` : '';
   const obs = item.Observaciones ? ` <span class="program-observation">${escapeHTML(item.Observaciones)}</span>` : '';
   return `<li>
-    ${item.Orden ? `<span class="program-number">${escapeHTML(item.Orden)}.</span>` : ''}
-    <span class="program-title">${escapeHTML(item.Titulo || '')}</span>
-    ${item.Asignado ? `<span class="program-dash">—</span> <span class="program-assigned">${escapeHTML(item.Asignado)}</span>${helper}` : ''}${obs}
+    <span class="program-number">${item.Orden ? `${escapeHTML(item.Orden)}.` : ''}</span>
+    <span><span class="program-title">${escapeHTML(item.Titulo || '')}</span>${item.Asignado ? ` <span class="program-dash">—</span> <span class="program-assigned">${escapeHTML(item.Asignado)}</span>${helper}` : ''}${obs}</span>
   </li>`;
 }
 
 function formatWeekTitle(semana) {
   const clean = String(semana || '').trim();
-  return clean.toUpperCase().startsWith('SEMANA') ? clean : `Semana ${clean}`;
+  return clean.toUpperCase().startsWith('SEMANA') ? clean.toUpperCase() : `SEMANA ${clean.toUpperCase()}`;
 }
 
 function renderFinSemana(items) { return createTable(items, expectedHeaders.findesemana); }
