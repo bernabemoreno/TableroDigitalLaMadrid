@@ -345,3 +345,211 @@ button.secondary:hover {
   .program-card h3 { font-size: 16px; }
   .program-card h2 { font-size: 18px; }
 }
+
+
+/* Formato similar al programa impreso de Vida y Ministerio */
+.program-card {
+  max-width: 1120px;
+  margin: 0 auto 28px;
+  padding: 24px 24px 32px;
+  background: #ffffff;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.22;
+}
+
+.program-headline {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: end;
+  gap: 12px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+  font-size: 22px;
+  color: #000;
+  margin-bottom: 2px;
+}
+
+.program-name {
+  text-align: right;
+}
+
+.program-rule {
+  height: 9px;
+  border-top: 4px solid #575b5e;
+  border-bottom: 3px solid #8c9194;
+  margin-bottom: 18px;
+  position: relative;
+}
+
+.program-rule span {
+  position: absolute;
+  left: 34%;
+  top: -4px;
+  width: 70px;
+  height: 4px;
+  background: #ffffff;
+}
+
+.program-card h2 {
+  margin: 0 0 18px;
+  color: #2d5d96;
+  text-align: left;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: none;
+}
+
+.program-meta {
+  margin: 0 0 16px;
+}
+
+.program-meta p,
+.program-footer p,
+.week-note,
+.special-week p {
+  margin: 5px 0;
+  font-size: 24px;
+  color: #000;
+}
+
+.program-meta p:first-child::before {
+  content: '';
+}
+
+.program-meta p strong,
+.program-footer p strong {
+  font-weight: 800;
+}
+
+.intro-line {
+  margin-top: 18px !important;
+  font-weight: 400;
+}
+
+.section-song {
+  margin: 14px 0 10px 13px;
+  font-size: 24px;
+  font-weight: 800;
+  color: #000;
+}
+
+.program-card h4.section-banner {
+  display: block;
+  width: 565px;
+  max-width: 100%;
+  margin: 26px 0 4px -13px;
+  padding: 5px 13px 4px;
+  color: #ffffff;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 22px;
+  line-height: 1.1;
+  font-weight: 800;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 0;
+  background: #5c6063;
+}
+
+.program-card h4.section-tesoros { background: #5c6063; }
+.program-card h4.section-seamos { background: #c89100; }
+.program-card h4.section-vida { background: #970028; }
+.program-card h4.section-otros { background: #2d5d96; }
+
+.program-list {
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+  counter-reset: item;
+}
+
+.program-list li,
+.book-study p {
+  margin: 4px 0;
+  font-size: 24px;
+  color: #000;
+}
+
+.program-number {
+  display: inline-block;
+  width: 28px;
+  margin-left: -38px;
+  margin-right: 10px;
+  font-weight: 400;
+  text-align: right;
+}
+
+.program-title {
+  font-weight: 400;
+}
+
+.program-dash {
+  margin: 0 4px;
+}
+
+.program-assigned,
+.helper,
+.study-lessons,
+.study-title {
+  font-weight: 400;
+  font-style: normal;
+  color: #000;
+}
+
+.helper::before {
+  content: '';
+}
+
+.book-study {
+  margin: 4px 0 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.book-study .study-title {
+  font-weight: 400;
+}
+
+.program-footer {
+  margin-top: 12px;
+  padding: 0;
+  border: none;
+  font-weight: 400;
+}
+
+.content-box:has(.program-card) {
+  background: #ffffff;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+}
+
+@media print {
+  @page { margin: 10mm; }
+
+  .program-card {
+    max-width: none;
+    padding: 0;
+    margin: 0;
+    page-break-after: always;
+    break-after: page;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .program-card h2 { font-size: 24px; }
+  .program-headline { font-size: 18px; }
+  .program-meta p,
+  .program-footer p,
+  .section-song,
+  .program-list li,
+  .book-study p { font-size: 18px; }
+  .program-card h4.section-banner { font-size: 18px; width: 530px; }
+  .program-rule span { background: #ffffff !important; }
+}

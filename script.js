@@ -134,13 +134,15 @@ function renderEntreSemana({ semanas, partes, estudio }) {
       const songBefore = section === 'NUESTRA VIDA CRISTIANA' && week.CancionVidaCristiana
         ? `<p class="section-song">Canción ${escapeHTML(week.CancionVidaCristiana)}</p>` : '';
       const studiesInside = section === 'NUESTRA VIDA CRISTIANA' ? renderStudies(weekStudies) : '';
-      return `${songBefore}<h4>${escapeHTML(section)}</h4><ol class="program-list">${rows}</ol>${studiesInside}`;
+      return `${songBefore}<h4 class="section-banner ${sectionClass(section)}"><span>${escapeHTML(section)}</span></h4><ol class="program-list">${rows}</ol>${studiesInside}`;
     }).join('');
 
     return `<article class="program-card">
-      <h3>PROGRAMA REUNIÓN ENTRE SEMANA</h3>
-      <p class="subtitle">Congregación LaMadrid</p>
-      <p class="subtitle">Julio 2026</p>
+      <div class="program-headline">
+        <div class="program-cong">Lamadrid</div>
+        <div class="program-name">Programa para la reunión de entre semana</div>
+      </div>
+      <div class="program-rule"><span></span></div>
       <h2>${escapeHTML(formatWeekTitle(semana))}</h2>
       ${notes ? `<p class="week-note">${escapeHTML(notes)}</p>` : ''}
       <div class="program-meta">
@@ -157,6 +159,14 @@ function renderEntreSemana({ semanas, partes, estudio }) {
       </div>
     </article>`;
   }).join('');
+}
+
+function sectionClass(section) {
+  const clean = String(section || '').toUpperCase();
+  if (clean.includes('TESOROS')) return 'section-tesoros';
+  if (clean.includes('SEAMOS')) return 'section-seamos';
+  if (clean.includes('VIDA')) return 'section-vida';
+  return 'section-otros';
 }
 
 function renderStudies(weekStudies) {
