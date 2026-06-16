@@ -1,2 +1,4 @@
-Fecha,Horario,Conferencia,Conferenciante,Congregacion,Atalaya,Lector,Observaciones
-Sábado 06/07,19:30,Conferencia pública a confirmar,Conferenciante a confirmar,Congregación asignada,Artículo a confirmar,Lector a confirmar,
+Fecha,Presidente,OradorVisitante,NumeroConferencia,TituloConferencia,Atalaya,LectorAtalaya,OradorSaliente,NumeroSaliente,Limpieza,CongregacionAsignada,Observaciones
+13/6/2026,Moreno Bernabé,Pérez Oscar,158,"Seamos valerosos y confiemos en Jehová",Funes Lucas,Policarpo,Carmelo Dechiara,156,Grupo 4,Jorge Newbery,
+20/6/2026,Veltruski Néstor,Rodriguez Federico,78,"Sirva a Jehová con alegría",Funes Lucas,Mercado Omar,Baez Sergio,,Grupo 5,Jorge Newbery,
+27/6/2026,Baez Sergio,Almeida Guillermo,68,"Sigan perdonándose con generosidad",Funes Lucas,Carmelo Dechiara,Moreno Bernabé,66,Grupo 6,Jorge Newbery,

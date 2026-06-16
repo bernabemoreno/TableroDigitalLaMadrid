@@ -1,29 +1,59 @@
 # Congregación LaMadrid - Tablero digital
 
-## Archivos principales
+Sitio estático para GitHub Pages y uso local. Muestra:
 
-- `index.html`
-- `style.css`
-- `script.js`
-- `salidas.csv`
-- `findesemana.csv`
-- `entresemana-semanas.csv`
-- `entresemana-partes.csv`
-- `entresemana-estudio.csv`
-- `config.json`
-- `mapa.jpg` opcional
+- Salidas
+- Reunión de entre semana
+- Reunión de fin de semana
+- Mapa de la congregación
+
+## Archivos CSV
+
+### salidas.csv
+
+```csv
+Fecha,Hora,Territorio,Lugar,Conductor,Observaciones
+```
+
+### entresemana-semanas.csv
+
+```csv
+Semana,LecturaSemanal,CancionInicial,Presidente,Introduccion,CancionVidaCristiana,Conclusion,CancionFinal,OracionFinal,Notas,Tipo
+```
+
+### entresemana-partes.csv
+
+```csv
+Semana,Seccion,Orden,Titulo,Asignado,Ayudante,Observaciones
+```
+
+Secciones aceptadas:
+
+- Tesoros de la Biblia
+- Seamos mejores maestros
+- Nuestra vida cristiana
+
+### entresemana-estudio.csv
+
+```csv
+Semana,Lecciones,Conductor,Lector,Observaciones
+```
+
+### findesemana.csv
+
+```csv
+Fecha,Presidente,OradorVisitante,NumeroConferencia,TituloConferencia,Atalaya,LectorAtalaya,OradorSaliente,NumeroSaliente,Limpieza,CongregacionAsignada,Observaciones
+```
 
 ## Uso en GitHub Pages
 
-Subí todos los archivos al repositorio. El sitio lee automáticamente los CSV publicados.
+Subí todos los archivos del proyecto al repositorio. El sitio lee automáticamente los CSV con esos nombres.
 
-También permite cargar CSV locales desde la computadora para probar o imprimir sin subirlos.
+## Uso local para imprimir
+
+Entrá al sitio y usá los botones de carga local para seleccionar CSV desde la computadora. No se suben a internet; solo se leen en el navegador para ver/imprimir.
 
 ## Mapa
 
-Para el mapa impreso, subí una imagen llamada `mapa.jpg`.
-Para el mapa online, cambiá el enlace dentro de `config.json`.
-
-## Evitar caché
-
-Si actualizás archivos y no ves cambios, usá Ctrl + F5 o agregá `?v=2` al final de la dirección.
+- `mapa.jpg`: imagen local del mapa para vista previa y descarga.
+- `config.json`: contiene el enlace online del mapa.

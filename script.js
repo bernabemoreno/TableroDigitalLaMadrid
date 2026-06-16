@@ -8,7 +8,7 @@ const csvFiles = {
 
 const expectedHeaders = {
   salidas: ['Fecha', 'Hora', 'Territorio', 'Lugar', 'Conductor', 'Observaciones'],
-  findesemana: ['Fecha', 'Horario', 'Conferencia', 'Conferenciante', 'Congregacion', 'Atalaya', 'Lector', 'Observaciones']
+  findesemana: ['Fecha', 'Presidente', 'OradorVisitante', 'NumeroConferencia', 'TituloConferencia', 'Atalaya', 'LectorAtalaya', 'OradorSaliente', 'NumeroSaliente', 'Limpieza', 'CongregacionAsignada', 'Observaciones']
 };
 
 const sectionLabels = {
@@ -189,7 +189,47 @@ function formatWeekTitle(semana) {
   return clean.toUpperCase().startsWith('SEMANA') ? clean.toUpperCase() : `SEMANA ${clean.toUpperCase()}`;
 }
 
-function renderFinSemana(items) { return createTable(items, expectedHeaders.findesemana); }
+function renderFinSemana(items) {
+  if (!items.length) return '<p>No hay datos cargados.</p>';
+  const congregacion = items.find(item => item.CongregacionAsignada)?.CongregacionAsignada || '';
+  const cards = items.map((item, index) => {
+    const colorClass = ['weekend-green', 'weekend-pink', 'weekend-purple'][index % 3];
+    return `<article class="weekend-card ${colorClass}">
+      <div class="weekend-date">
+        <strong>${escapeHTML(item.Fecha || '')}</strong>
+        ${item.Limpieza ? `<span>Limpieza ${escapeHTML(item.Limpieza)}</span>` : ''}
+      </div>
+      <div class="weekend-assignments">
+        ${renderWeekendLine('Presidente y oración', item.Presidente)}
+        ${renderWeekendLine('Orador visitante', item.OradorVisitante, item.NumeroConferencia)}
+        ${item.TituloConferencia ? `<p class="weekend-conference"><strong>Conferencia: &quot;${escapeHTML(item.TituloConferencia)}&quot;</strong></p>` : ''}
+        ${renderWeekendLine('Atalaya', item.Atalaya)}
+        ${renderWeekendLine('Lector Atalaya', item.LectorAtalaya)}
+        ${renderWeekendLine('Orador saliente', item.OradorSaliente, item.NumeroSaliente)}
+        ${item.Observaciones ? `<p class="weekend-note">${escapeHTML(item.Observaciones)}</p>` : ''}
+      </div>
+    </article>`;
+  }).join('');
+
+  return `<section class="weekend-program">
+    <div class="weekend-cover">
+      <div class="cover-icon">▰</div>
+      <h3>PROGRAMA DE ASIGNACIONES</h3>
+      <p>Conferencia Pública y Estudio de La Atalaya</p>
+      <p>Congregación LaMadrid</p>
+    </div>
+    <div class="weekend-table-head">
+      <span>Fecha</span><span>Asignación</span><span>Nombre</span>
+    </div>
+    ${cards}
+    ${congregacion ? `<div class="assigned-congregation">Congregación asignada <strong>${escapeHTML(congregacion)}</strong></div>` : ''}
+  </section>`;
+}
+
+function renderWeekendLine(label, name, number) {
+  if (!name && !number) return '';
+  return `<p class="weekend-line"><span>${escapeHTML(label)}</span><span>${escapeHTML(name || '')}</span>${number ? `<span class="weekend-number">${escapeHTML(number)}</span>` : '<span></span>'}</p>`;
+}
 
 function groupBy(items, key) {
   return items.reduce((acc, item) => {
