@@ -24,9 +24,13 @@
       <div class="panel-head">
         <div>
           <h2>Salidas</h2>
-          <p class="hint">Datos tomados desde <strong>salidas.csv</strong></p>
+          <p class="hint">Lee <strong>salidas.csv</strong> desde GitHub o podés cargar uno local para probar/imprimir.</p>
         </div>
         <button onclick="printSection('salidas')">Imprimir</button>
+      </div>
+      <div class="local-loader">
+        <label>Cargar CSV local de salidas: <input type="file" accept=".csv,text/csv" data-local-csv="salidas" /></label>
+        <button class="secondary" onclick="reloadFromGithub('salidas')">Volver a GitHub</button>
       </div>
       <div id="salidas-content" class="content-box"></div>
     </section>
@@ -35,9 +39,15 @@
       <div class="panel-head">
         <div>
           <h2>Reunión de entre semana</h2>
-          <p class="hint">Datos tomados desde <strong>entresemana.csv</strong></p>
+          <p class="hint">Lee <strong>entresemana-semanas.csv</strong>, <strong>entresemana-partes.csv</strong> y <strong>entresemana-estudio.csv</strong>.</p>
         </div>
         <button onclick="printSection('entresemana')">Imprimir</button>
+      </div>
+      <div class="local-loader grid-loader">
+        <label>Semanas: <input type="file" accept=".csv,text/csv" data-local-csv="entresemana-semanas" /></label>
+        <label>Partes: <input type="file" accept=".csv,text/csv" data-local-csv="entresemana-partes" /></label>
+        <label>Estudio bíblico: <input type="file" accept=".csv,text/csv" data-local-csv="entresemana-estudio" /></label>
+        <button class="secondary" onclick="reloadFromGithub('entresemana')">Volver a GitHub</button>
       </div>
       <div id="entresemana-content" class="content-box"></div>
     </section>
@@ -46,9 +56,13 @@
       <div class="panel-head">
         <div>
           <h2>Reunión de fin de semana</h2>
-          <p class="hint">Datos tomados desde <strong>findesemana.csv</strong></p>
+          <p class="hint">Lee <strong>findesemana.csv</strong> desde GitHub o podés cargar uno local.</p>
         </div>
         <button onclick="printSection('findesemana')">Imprimir</button>
+      </div>
+      <div class="local-loader">
+        <label>Cargar CSV local de fin de semana: <input type="file" accept=".csv,text/csv" data-local-csv="findesemana" /></label>
+        <button class="secondary" onclick="reloadFromGithub('findesemana')">Volver a GitHub</button>
       </div>
       <div id="findesemana-content" class="content-box"></div>
     </section>
@@ -57,7 +71,7 @@
       <div class="panel-head">
         <div>
           <h2>Mapa de la congregación</h2>
-          <p class="hint">Usa <strong>mapa.jpg</strong> y el enlace configurado en <strong>config.json</strong></p>
+          <p class="hint">Usa <strong>mapa.jpg</strong> y el enlace configurado en <strong>config.json</strong>.</p>
         </div>
         <button onclick="printSection('mapa')">Imprimir mapa</button>
       </div>
@@ -74,7 +88,7 @@
   </main>
 
   <footer>
-    <p>Última actualización visible según los archivos CSV cargados en GitHub.</p>
+    <p>Última actualización según los archivos CSV publicados en GitHub o los archivos locales cargados para prueba.</p>
   </footer>
 
   <script src="script.js"></script>

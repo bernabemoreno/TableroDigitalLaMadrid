@@ -1,14 +1,27 @@
 const csvFiles = {
   salidas: 'salidas.csv',
-  entresemana: 'entresemana.csv',
-  findesemana: 'findesemana.csv'
+  finde: 'findesemana.csv',
+  semanas: 'entresemana-semanas.csv',
+  partes: 'entresemana-partes.csv',
+  estudio: 'entresemana-estudio.csv'
 };
 
 const expectedHeaders = {
   salidas: ['Fecha', 'Hora', 'Territorio', 'Lugar', 'Conductor', 'Observaciones'],
-  entresemana: ['Fecha', 'Seccion', 'Titulo', 'Asignado', 'Ayudante', 'Observaciones'],
   findesemana: ['Fecha', 'Horario', 'Conferencia', 'Conferenciante', 'Congregacion', 'Atalaya', 'Lector', 'Observaciones']
 };
+
+const sectionLabels = {
+  'tesoros': 'TESOROS DE LA BIBLIA',
+  'tesoros de la biblia': 'TESOROS DE LA BIBLIA',
+  'seamos': 'SEAMOS MEJORES MAESTROS',
+  'seamos mejores maestros': 'SEAMOS MEJORES MAESTROS',
+  'vida': 'NUESTRA VIDA CRISTIANA',
+  'nuestra vida cristiana': 'NUESTRA VIDA CRISTIANA',
+  'mi vida cristiana': 'NUESTRA VIDA CRISTIANA'
+};
+const sectionOrder = ['TESOROS DE LA BIBLIA', 'SEAMOS MEJORES MAESTROS', 'NUESTRA VIDA CRISTIANA'];
+const localData = {};
 
 document.querySelectorAll('.tab').forEach(button => {
   button.addEventListener('click', () => {
@@ -19,40 +32,40 @@ document.querySelectorAll('.tab').forEach(button => {
   });
 });
 
+document.querySelectorAll('[data-local-csv]').forEach(input => {
+  input.addEventListener('change', async event => {
+    const file = event.target.files[0];
+    if (!file) return;
+    const key = event.target.dataset.localCsv;
+    const text = await file.text();
+    localData[key] = rowsToObjects(parseCSV(text));
+    if (key.startsWith('entresemana')) renderEntreSemanaFromCurrentSources();
+    if (key === 'salidas') document.getElementById('salidas-content').innerHTML = renderSalidas(localData.salidas);
+    if (key === 'findesemana') document.getElementById('findesemana-content').innerHTML = renderFinSemana(localData.findesemana);
+  });
+});
+
+function escapeHTML(value) {
+  return String(value || '')
+    .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+}
+
 function parseCSV(text) {
-  const rows = [];
-  let row = [];
-  let cell = '';
-  let insideQuotes = false;
-
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i];
-    const next = text[i + 1];
-
-    if (char === '"' && insideQuotes && next === '"') {
-      cell += '"';
-      i++;
-    } else if (char === '"') {
-      insideQuotes = !insideQuotes;
-    } else if (char === ',' && !insideQuotes) {
-      row.push(cell.trim());
-      cell = '';
-    } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+  const rows = []; let row = []; let cell = ''; let insideQuotes = false;
+  const clean = text.replace(/^\uFEFF/, '');
+  for (let i = 0; i < clean.length; i++) {
+    const char = clean[i]; const next = clean[i + 1];
+    if (char === '"' && insideQuotes && next === '"') { cell += '"'; i++; }
+    else if (char === '"') insideQuotes = !insideQuotes;
+    else if (char === ',' && !insideQuotes) { row.push(cell.trim()); cell = ''; }
+    else if ((char === '\n' || char === '\r') && !insideQuotes) {
       if (char === '\r' && next === '\n') i++;
-      row.push(cell.trim());
-      if (row.some(value => value !== '')) rows.push(row);
-      row = [];
-      cell = '';
-    } else {
-      cell += char;
-    }
+      row.push(cell.trim()); if (row.some(value => value !== '')) rows.push(row);
+      row = []; cell = '';
+    } else cell += char;
   }
-
-  if (cell || row.length) {
-    row.push(cell.trim());
-    if (row.some(value => value !== '')) rows.push(row);
-  }
-
+  if (cell || row.length) { row.push(cell.trim()); if (row.some(value => value !== '')) rows.push(row); }
   return rows;
 }
 
@@ -60,58 +73,174 @@ function rowsToObjects(rows) {
   const headers = rows[0] || [];
   return rows.slice(1).map(row => {
     const obj = {};
-    headers.forEach((header, index) => obj[header] = row[index] || '');
+    headers.forEach((header, index) => obj[header.trim()] = row[index] || '');
     return obj;
   });
 }
 
 function createTable(items, headers) {
   if (!items.length) return '<p>No hay datos cargados.</p>';
-  const head = headers.map(h => `<th>${h}</th>`).join('');
-  const body = items.map(item => `<tr>${headers.map(h => `<td>${item[h] || ''}</td>`).join('')}</tr>`).join('');
+  const head = headers.map(h => `<th>${escapeHTML(h)}</th>`).join('');
+  const body = items.map(item => `<tr>${headers.map(h => `<td>${escapeHTML(item[h] || '')}</td>`).join('')}</tr>`).join('');
   return `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
 }
 
+function normalizeSection(section) {
+  const clean = String(section || '').trim().toLowerCase();
+  return sectionLabels[clean] || String(section || 'OTROS').toUpperCase();
+}
+
+function isSpecialWeek(week) {
+  return String(week.Tipo || week.TipoSemana || '').toLowerCase().includes('especial') ||
+    (!week.LecturaSemanal && !week.CancionInicial && !week.Presidente && week.Notas);
+}
+
+function renderSalidas(items) { return createTable(items, expectedHeaders.salidas); }
+
+function renderEntreSemana({ semanas, partes, estudio }) {
+  if (!semanas.length) return '<p>No hay semanas cargadas.</p>';
+  const partsByWeek = groupBy(partes, 'Semana');
+  const studiesByWeek = groupBy(estudio, 'Semana');
+
+  return semanas.map(week => {
+    const semana = week.Semana || 'Semana sin nombre';
+    const notes = week.Notas || '';
+
+    if (isSpecialWeek(week)) {
+      return `<article class="program-card special-week">
+        <h3>PROGRAMA REUNIÓN ENTRE SEMANA</h3>
+        <p class="subtitle">Congregación LaMadrid</p>
+        <h2>${escapeHTML(formatWeekTitle(semana))}</h2>
+        ${notes ? `<p>${escapeHTML(notes)}</p>` : ''}
+      </article>`;
+    }
+
+    const weekParts = (partsByWeek[semana] || []).slice().sort((a, b) => Number(a.Orden || 0) - Number(b.Orden || 0));
+    const weekStudies = studiesByWeek[semana] || [];
+    const groupedSections = {};
+    weekParts.forEach(part => {
+      const section = normalizeSection(part.Seccion);
+      if (!groupedSections[section]) groupedSections[section] = [];
+      groupedSections[section].push(part);
+    });
+
+    const orderedSections = [
+      ...sectionOrder.filter(section => groupedSections[section]),
+      ...Object.keys(groupedSections).filter(section => !sectionOrder.includes(section))
+    ];
+
+    const sectionsHtml = orderedSections.map(section => {
+      const rows = groupedSections[section].map(item => renderProgramItem(item)).join('');
+      const songBefore = section === 'NUESTRA VIDA CRISTIANA' && week.CancionVidaCristiana
+        ? `<p class="section-song">Canción ${escapeHTML(week.CancionVidaCristiana)}</p>` : '';
+      const studiesInside = section === 'NUESTRA VIDA CRISTIANA' ? renderStudies(weekStudies) : '';
+      return `${songBefore}<h4>${escapeHTML(section)}</h4><ol class="program-list">${rows}</ol>${studiesInside}`;
+    }).join('');
+
+    return `<article class="program-card">
+      <h3>PROGRAMA REUNIÓN ENTRE SEMANA</h3>
+      <p class="subtitle">Congregación LaMadrid</p>
+      <p class="subtitle">Julio 2026</p>
+      <h2>${escapeHTML(formatWeekTitle(semana))}</h2>
+      ${notes ? `<p class="week-note">${escapeHTML(notes)}</p>` : ''}
+      <div class="program-meta">
+        ${week.LecturaSemanal ? `<p>Lectura semanal de la Biblia: ${escapeHTML(week.LecturaSemanal)}</p>` : ''}
+        ${week.CancionInicial ? `<p>Canción ${escapeHTML(week.CancionInicial)}</p>` : ''}
+        ${week.Presidente ? `<p>Presidente y oración: ${escapeHTML(week.Presidente)}</p>` : ''}
+        ${week.Introduccion ? `<p class="intro-line">${escapeHTML(week.Introduccion)}</p>` : ''}
+      </div>
+      ${sectionsHtml}
+      <div class="program-footer">
+        ${week.Conclusion ? `<p>${escapeHTML(week.Conclusion)}</p>` : ''}
+        ${week.CancionFinal ? `<p>Canción ${escapeHTML(week.CancionFinal)}</p>` : ''}
+        ${week.OracionFinal ? `<p>Oración: ${escapeHTML(week.OracionFinal)}</p>` : ''}
+      </div>
+    </article>`;
+  }).join('');
+}
+
+function renderStudies(weekStudies) {
+  return weekStudies.map(st => `<div class="book-study">
+    <p><span class="study-title">Estudio bíblico de la congregación</span>${st.Lecciones ? ` <span class="study-lessons">(${escapeHTML(st.Lecciones)})</span>` : ''}
+    ${st.Conductor ? `<span class="program-dash">—</span> <span class="program-assigned">${escapeHTML(st.Conductor)}</span>` : ''}${st.Lector ? ` <span class="helper">c/ ${escapeHTML(st.Lector)}</span>` : ''}</p>
+    ${st.Observaciones ? `<p class="program-observation no-indent">${escapeHTML(st.Observaciones)}</p>` : ''}
+  </div>`).join('');
+}
+
+function renderProgramItem(item) {
+  const helper = item.Ayudante ? ` <span class="helper">c/ ${escapeHTML(item.Ayudante)}</span>` : '';
+  const obs = item.Observaciones ? ` <span class="program-observation">${escapeHTML(item.Observaciones)}</span>` : '';
+  return `<li>
+    ${item.Orden ? `<span class="program-number">${escapeHTML(item.Orden)}.</span>` : ''}
+    <span class="program-title">${escapeHTML(item.Titulo || '')}</span>
+    ${item.Asignado ? `<span class="program-dash">—</span> <span class="program-assigned">${escapeHTML(item.Asignado)}</span>${helper}` : ''}${obs}
+  </li>`;
+}
+
+function formatWeekTitle(semana) {
+  const clean = String(semana || '').trim();
+  return clean.toUpperCase().startsWith('SEMANA') ? clean : `Semana ${clean}`;
+}
+
+function renderFinSemana(items) { return createTable(items, expectedHeaders.findesemana); }
+
 function groupBy(items, key) {
   return items.reduce((acc, item) => {
-    const value = item[key] || 'Sin fecha';
+    const value = item[key] || 'Sin grupo';
     if (!acc[value]) acc[value] = [];
     acc[value].push(item);
     return acc;
   }, {});
 }
 
-function renderSalidas(items) {
-  return createTable(items, expectedHeaders.salidas);
+async function fetchCsvObjects(path) {
+  const response = await fetch(path, { cache: 'no-store' });
+  if (!response.ok) throw new Error(`No se pudo leer ${path}`);
+  return rowsToObjects(parseCSV(await response.text()));
 }
 
-function renderEntreSemana(items) {
-  const groupedByDate = groupBy(items, 'Fecha');
-  return Object.entries(groupedByDate).map(([date, dateItems]) => {
-    const groupedBySection = groupBy(dateItems, 'Seccion');
-    const sections = Object.entries(groupedBySection).map(([section, sectionItems]) => {
-      return `<h4 class="section-title">${section}</h4>` + createTable(sectionItems, ['Titulo', 'Asignado', 'Ayudante', 'Observaciones']);
-    }).join('');
-    return `<h3 class="date-group">${date}</h3>${sections}`;
-  }).join('');
-}
-
-function renderFinSemana(items) {
-  return createTable(items, expectedHeaders.findesemana);
-}
-
-async function loadCSV(type, renderer) {
-  const target = document.getElementById(`${type}-content`);
+async function loadCSV(type) {
   try {
-    const response = await fetch(csvFiles[type], { cache: 'no-store' });
-    if (!response.ok) throw new Error(`No se pudo leer ${csvFiles[type]}`);
-    const text = await response.text();
-    const rows = parseCSV(text);
-    const items = rowsToObjects(rows);
-    target.innerHTML = renderer(items);
+    if (type === 'salidas') {
+      const data = await fetchCsvObjects(csvFiles.salidas);
+      localData.salidasGithub = data;
+      document.getElementById('salidas-content').innerHTML = renderSalidas(data);
+    }
+    if (type === 'findesemana') {
+      const data = await fetchCsvObjects(csvFiles.finde);
+      localData.findesemanaGithub = data;
+      document.getElementById('findesemana-content').innerHTML = renderFinSemana(data);
+    }
+    if (type === 'entresemana') {
+      localData['entresemana-semanas-github'] = await fetchCsvObjects(csvFiles.semanas);
+      localData['entresemana-partes-github'] = await fetchCsvObjects(csvFiles.partes);
+      localData['entresemana-estudio-github'] = await fetchCsvObjects(csvFiles.estudio);
+      renderEntreSemanaFromCurrentSources();
+    }
   } catch (error) {
-    target.innerHTML = `<div class="error">${error.message}. Revisá que el archivo exista en GitHub y tenga el nombre correcto.</div>`;
+    document.getElementById(`${type}-content`).innerHTML = `<div class="error">${escapeHTML(error.message)}. Revisá que el archivo exista y tenga el nombre correcto.</div>`;
   }
+}
+
+function renderEntreSemanaFromCurrentSources() {
+  const data = {
+    semanas: localData['entresemana-semanas'] || localData['entresemana-semanas-github'] || [],
+    partes: localData['entresemana-partes'] || localData['entresemana-partes-github'] || [],
+    estudio: localData['entresemana-estudio'] || localData['entresemana-estudio-github'] || []
+  };
+  document.getElementById('entresemana-content').innerHTML = renderEntreSemana(data);
+}
+
+async function reloadFromGithub(type) {
+  if (type === 'salidas') delete localData.salidas;
+  if (type === 'findesemana') delete localData.findesemana;
+  if (type === 'entresemana') {
+    delete localData['entresemana-semanas'];
+    delete localData['entresemana-partes'];
+    delete localData['entresemana-estudio'];
+  }
+  document.querySelectorAll(`[data-local-csv^="${type}"]`).forEach(input => input.value = '');
+  await loadCSV(type);
 }
 
 async function loadConfig() {
@@ -119,11 +248,8 @@ async function loadConfig() {
     const response = await fetch('config.json', { cache: 'no-store' });
     if (!response.ok) throw new Error('No config');
     const config = await response.json();
-    const link = document.getElementById('online-map');
-    link.href = config.mapaOnline || '#';
-  } catch {
-    document.getElementById('online-map').href = '#';
-  }
+    document.getElementById('online-map').href = config.mapaOnline || '#';
+  } catch { document.getElementById('online-map').href = '#'; }
 }
 
 function printSection(sectionId) {
@@ -133,7 +259,7 @@ function printSection(sectionId) {
   setTimeout(() => document.getElementById(sectionId).classList.remove('printing'), 500);
 }
 
-loadCSV('salidas', renderSalidas);
-loadCSV('entresemana', renderEntreSemana);
-loadCSV('findesemana', renderFinSemana);
+loadCSV('salidas');
+loadCSV('entresemana');
+loadCSV('findesemana');
 loadConfig();
