@@ -102,7 +102,63 @@ function isSpecialWeek(week) {
     (!week.LecturaSemanal && !week.CancionInicial && !week.Presidente && week.Notas);
 }
 
-function renderSalidas(items) { return createTable(items, expectedHeaders.salidas); }
+function renderSalidas(items) {
+  if (!items.length) return '<p>No hay salidas cargadas.</p>';
+
+  const first = items[0] || {};
+  const titulo = first.Titulo || 'PROGRAMA DE ACTIVIDAD SEMANAL';
+  const subtitulo = first.Subtitulo || 'DÍAS y HORARIOS';
+  const congregacion = first.Congregacion || 'Congregación Lamadrid';
+  const periodo = first.Periodo || '';
+  const nota = items.find(i => i.Nota)?.Nota || '';
+
+  const rows = items.map(item => {
+    const tipo = String(item.Tipo || '').toLowerCase();
+    const isPhone = tipo.includes('tele') || String(item.Lugar || '').toLowerCase().includes('telefónica');
+    const isGroups = tipo.includes('grupo') || String(item.Lugar || '').toLowerCase().includes('grupos');
+    const tipoClass = isPhone ? 'salida-telefono' : isGroups ? 'salida-grupos' : 'salida-casa';
+    const icon = isPhone ? '☎' : '⌂';
+
+    return `<tr class="${tipoClass}">
+      <td class="salida-dia"><strong>${escapeHTML(item.Dia || '')}</strong> <span class="salida-icon">${icon}</span></td>
+      <td>${escapeHTML(item.Fecha || '')}</td>
+      <td class="salida-hora">${escapeHTML(item.Hora || '')}</td>
+      <td class="salida-lugar">${escapeHTML(item.Lugar || '')}</td>
+      <td class="salida-territorio">${escapeHTML(item.Territorio || '')}</td>
+      <td>${escapeHTML(item.Conduce || '')}</td>
+    </tr>`;
+  }).join('');
+
+  return `<section class="salidas-print">
+    <div class="salidas-banner">
+      <div class="salidas-banner-side salidas-left"></div>
+      <div class="salidas-banner-center">
+        <p class="salidas-programa">${escapeHTML(titulo)}</p>
+        <h2>${escapeHTML(congregacion)}</h2>
+        ${periodo ? `<p class="salidas-periodo">${escapeHTML(periodo)}</p>` : ''}
+      </div>
+      <div class="salidas-banner-side salidas-right"></div>
+    </div>
+
+    <h3 class="salidas-subtitulo">${escapeHTML(subtitulo)}</h3>
+
+    <table class="salidas-table">
+      <thead>
+        <tr>
+          <th>Día</th>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Lugar de Encuentro</th>
+          <th>N° de Territorio</th>
+          <th>Conduce</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+
+    ${nota ? `<p class="salidas-nota">${escapeHTML(nota)}</p>` : ''}
+  </section>`;
+}
 
 function renderEntreSemana({ semanas, partes, estudio }) {
   if (!semanas.length) return '<p>No hay semanas cargadas.</p>';

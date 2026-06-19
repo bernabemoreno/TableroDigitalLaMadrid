@@ -1,59 +1,46 @@
 # Congregación LaMadrid - Tablero digital
 
-Sitio estático para GitHub Pages y uso local. Muestra:
+Sitio estático para GitHub Pages.
 
-- Salidas
-- Reunión de entre semana
-- Reunión de fin de semana
-- Mapa de la congregación
+## Archivos principales
 
-## Archivos CSV
+- `index.html`
+- `style.css`
+- `script.js`
+- `salidas.csv`
+- `entresemana-semanas.csv`
+- `entresemana-partes.csv`
+- `entresemana-estudio.csv`
+- `findesemana.csv`
+- `config.json`
+- `mapa.jpg`
 
-### salidas.csv
+## Mapa online
 
-```csv
-Fecha,Hora,Territorio,Lugar,Conductor,Observaciones
+El enlace está en `config.json`:
+
+```json
+{
+  "mapaOnline": "https://bit.ly/4eFGdTm?r=qr"
+}
 ```
 
-### entresemana-semanas.csv
+## Salidas
+
+Formato esperado de `salidas.csv`:
 
 ```csv
-Semana,LecturaSemanal,CancionInicial,Presidente,Introduccion,CancionVidaCristiana,Conclusion,CancionFinal,OracionFinal,Notas,Tipo
+Titulo,Subtitulo,Congregacion,Periodo,Dia,Fecha,Hora,Lugar,Territorio,Conduce,Tipo,Nota
 ```
 
-### entresemana-partes.csv
+Tipos recomendados:
 
-```csv
-Semana,Seccion,Orden,Titulo,Asignado,Ayudante,Observaciones
-```
+- `Casa en casa`
+- `Telefónica`
+- `Grupos`
 
-Secciones aceptadas:
+El sitio lee el CSV desde GitHub, pero también permite cargar un CSV local desde la computadora para probar e imprimir sin subirlo.
 
-- Tesoros de la Biblia
-- Seamos mejores maestros
-- Nuestra vida cristiana
+## Impresión
 
-### entresemana-estudio.csv
-
-```csv
-Semana,Lecciones,Conductor,Lector,Observaciones
-```
-
-### findesemana.csv
-
-```csv
-Fecha,Presidente,OradorVisitante,NumeroConferencia,TituloConferencia,Atalaya,LectorAtalaya,OradorSaliente,NumeroSaliente,Limpieza,CongregacionAsignada,Observaciones
-```
-
-## Uso en GitHub Pages
-
-Subí todos los archivos del proyecto al repositorio. El sitio lee automáticamente los CSV con esos nombres.
-
-## Uso local para imprimir
-
-Entrá al sitio y usá los botones de carga local para seleccionar CSV desde la computadora. No se suben a internet; solo se leen en el navegador para ver/imprimir.
-
-## Mapa
-
-- `mapa.jpg`: imagen local del mapa para vista previa y descarga.
-- `config.json`: contiene el enlace online del mapa.
+Cada sección tiene botón de imprimir. Al imprimir se ocultan botones, pestañas y controles.
