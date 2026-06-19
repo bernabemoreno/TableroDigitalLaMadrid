@@ -127,27 +127,39 @@ function renderEntreSemana({ semanas, partes, estudio }) {
     weekParts.forEach(part => {
       const section = normalizeSection(part.Seccion);
       if (!groupedSections[section]) groupedSections[section] = [];
-      groupedSections[section].push(part);
-    });
+   groupedSections[section].push(part);
+});
 
-    const orderedSections = [
-      ...sectionOrder.filter(section => groupedSections[section]),
-      ...Object.keys(groupedSections).filter(section => !sectionOrder.includes(section))
-    ];
+const orderedSections = [
+  ...sectionOrder.filter(section => groupedSections[section]),
+  ...Object.keys(groupedSections).filter(section => !sectionOrder.includes(section))
+];
 
-    const sectionsHtml = orderedSections.map(section => {
-      const rows = groupedSections[section].map(item => renderProgramItem(item)).join('');
-      const songBefore = section === 'NUESTRA VIDA CRISTIANA' && week.CancionVidaCristiana
-        ? `<p class="section-song"><strong>Canción ${escapeHTML(week.CancionVidaCristiana)}</strong></p>` : '';
-      const studiesInside = section === 'NUESTRA VIDA CRISTIANA' ? renderStudies(weekStudies) : '';
-      return `<section class="program-section">${songBefore}<div class="section-bar ${sectionClass(section)}">${escapeHTML(section)}</div><ol class="program-list">${rows}</ol>${studiesInside}</section>`;
-    }).join('');
+const sectionsHtml = orderedSections.map(section => {
+  const rows = groupedSections[section].map(item => renderProgramItem(item)).join('');
 
-    return `<article class="program-card">
-      ${renderTopLine()}
-      <h2 class="week-title">${escapeHTML(formatWeekTitle(semana))}</h2>
-      ${notes ? `<p class="week-note">${escapeHTML(notes)}</p>` : ''}
-      <div class="program-meta">
+  const songInside = section === 'NUESTRA VIDA CRISTIANA' && week.CancionVidaCristiana
+    ? `<p class="section-song"><strong>Canción ${escapeHTML(week.CancionVidaCristiana)}</strong></p>`
+    : '';
+
+  const studiesInside = section === 'NUESTRA VIDA CRISTIANA'
+    ? renderStudies(weekStudies)
+    : '';
+
+  return `<section class="program-section">
+    <div class="section-bar ${sectionClass(section)}">${escapeHTML(section)}</div>
+    ${songInside}
+    <ol class="program-list">${rows}</ol>
+    ${studiesInside}
+  </section>`;
+}).join('');
+
+return `<article class="program-card">
+  ${renderTopLine()}
+  <h2 class="week-title">${escapeHTML(formatWeekTitle(semana))}</h2>
+  ${notes ? `<p class="week-note">${escapeHTML(notes)}</p>` : ''}
+  <div class="program-meta">
+
         ${week.LecturaSemanal ? `<p><strong>Lectura semanal de la Biblia:</strong> ${escapeHTML(week.LecturaSemanal)}</p>` : ''}
         ${week.CancionInicial ? `<p><strong>Canción ${escapeHTML(week.CancionInicial)}</strong></p>` : ''}
         ${week.Presidente ? `<p><strong>Presidente y oración:</strong> ${escapeHTML(week.Presidente)}</p>` : ''}
