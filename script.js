@@ -262,6 +262,7 @@ function renderFinSemana(items) {
   const congregacion = items.find(item => item.CongregacionAsignada)?.CongregacionAsignada || '';
   const cards = items.map((item, index) => {
     const colorClass = ['weekend-green', 'weekend-pink', 'weekend-purple'][index % 3];
+    const salidas = renderWeekendSalidas(item);
     return `<article class="weekend-card ${colorClass}">
       <div class="weekend-date">
         <strong>${escapeHTML(item.Fecha || '')}</strong>
@@ -273,7 +274,7 @@ function renderFinSemana(items) {
         ${item.TituloConferencia ? `<p class="weekend-conference"><strong>Conferencia: &quot;${escapeHTML(item.TituloConferencia)}&quot;</strong></p>` : ''}
         ${renderWeekendLine('Atalaya', item.Atalaya)}
         ${renderWeekendLine('Lector Atalaya', item.LectorAtalaya)}
-        ${renderWeekendLine('Orador saliente', item.OradorSaliente, item.NumeroSaliente)}
+        ${salidas}
         ${item.Observaciones ? `<p class="weekend-note">${escapeHTML(item.Observaciones)}</p>` : ''}
       </div>
     </article>`;
@@ -287,11 +288,38 @@ function renderFinSemana(items) {
       <p>Congregación LaMadrid</p>
     </div>
     <div class="weekend-table-head">
-      <span>Fecha</span><span>Asignación</span><span>Nombre</span>
+      <span>Fecha</span><span>Asignación</span><span>Nombre / datos</span>
     </div>
     ${cards}
-    ${congregacion ? `<div class="assigned-congregation">Congregación asignada <strong>${escapeHTML(congregacion)}</strong></div>` : ''}
+    ${congregacion ? `<div class="assigned-congregation">Congregación invitada <strong>${escapeHTML(congregacion)}</strong></div>` : ''}
   </section>`;
+}
+
+function parseWeekendSalidas(item) {
+  const salidas = [];
+
+  // Formato nuevo: Salidas = "Nombre|N°|Congregación;Otro nombre|N°|Congregación"
+  String(item.Salidas || '').split(';').forEach(raw => {
+    const parts = raw.split('|').map(part => part.trim());
+    if (parts.some(Boolean)) salidas.push({ nombre: parts[0] || '', numero: parts[1] || '', congregacion: parts[2] || '' });
+  });
+
+  // Compatibilidad con el formato anterior.
+  if (!salidas.length && (item.OradorSaliente || item.NumeroSaliente)) {
+    salidas.push({ nombre: item.OradorSaliente || '', numero: item.NumeroSaliente || '', congregacion: item.CongregacionSaliente || '' });
+  }
+
+  return salidas;
+}
+
+function renderWeekendSalidas(item) {
+  const salidas = parseWeekendSalidas(item);
+  if (!salidas.length) return '';
+  const rows = salidas.map(salida => {
+    const destino = salida.congregacion ? ` <span class="weekend-destination">(${escapeHTML(salida.congregacion)})</span>` : '';
+    return `<p class="weekend-line weekend-outgoing"><span>Orador saliente</span><span>${escapeHTML(salida.nombre)}${destino}</span>${salida.numero ? `<span class="weekend-number">${escapeHTML(salida.numero)}</span>` : '<span></span>'}</p>`;
+  }).join('');
+  return `<div class="weekend-outgoing-list">${rows}</div>`;
 }
 
 function renderWeekendLine(label, name, number) {

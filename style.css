@@ -618,3 +618,12 @@ footer { text-align: center; color: #64748b; padding: 20px; }
   .salidas-table th { font-size: 11pt; }
   .salidas-nota { font-size: 9.5pt; }
 }
+
+.weekend-outgoing-list {
+  margin-top: 4px;
+}
+
+.weekend-outgoing .weekend-destination {
+  font-size: .92em;
+  opacity: .85;
+}
